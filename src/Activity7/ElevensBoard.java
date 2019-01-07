@@ -187,6 +187,28 @@ public class ElevensBoard {
      */
     public boolean isLegal(List<Integer> selectedCards) {
 		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        if (selectedCards.size() == 3) {
+            int jacks = 0, queens = 0, kings = 0;
+            for (int i = 0; i < 3; i ++) {
+                if (cards[i].getRank().equals("jack")) {
+                    jacks ++;
+                }
+                if (cards[i].getRank().equals("queen")) {
+                    queens ++;
+                }
+                if (cards[i].getRank().equals("king")) {
+                    kings ++;
+                }
+            }
+            if (jacks == 1 && queens == 1 && kings == 1) {
+                return true;
+            }
+            return false;
+        }
+        if (selectedCards.size() == 2) {
+            return (cards[0].getPointValue() + cards[1].getPointValue() == 11);
+        }
+        return false;
     }
 
     /**
@@ -199,6 +221,41 @@ public class ElevensBoard {
      */
     public boolean anotherPlayIsPossible() {
 		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        // Perform check 1: if 2 cards add to 11
+        ArrayList<Integer> tempCards = new ArrayList<>();
+        for (int i = 0; i < cards.length - 1; i ++) {
+            for (int j = 1; j < cards.length; j ++) {
+                tempCards.add(i);
+                tempCards.add(j);
+                if (isLegal(tempCards)) {
+                    return true;
+                }
+                tempCards.clear();
+            }
+        }
+        // Perform check 2: if 3 cards are j, q, and k
+        for (int i = 0; i < cards.length - 2; i ++) {
+            for (int j = 1; j < cards.length - 1; j ++) {
+                for (int k = 2; k < cards.length; k ++) {
+                    tempCards.add(i);
+                    tempCards.add(j);
+                    tempCards.add(k);
+                    if (isLegal(tempCards)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+        /*
+        for (int i = 0; i < cards.length - 1; i ++) {
+            for (int j = 1; j < cards.length; j ++) {
+                if (cards[i].getPointValue() + cards[j].getPointValue() == 11) {
+                    return true;
+                }
+            }
+        }
+        */
     }
 
 
