@@ -200,10 +200,8 @@ public class ElevensBoard {
                     kings ++;
                 }
             }
-            if (jacks == 1 && queens == 1 && kings == 1) {
-                return true;
-            }
-            return false;
+            return (jacks == 1 && queens == 1 && kings == 1);
+
         }
         if (selectedCards.size() == 2) {
             return (cards[0].getPointValue() + cards[1].getPointValue() == 11);
@@ -221,6 +219,7 @@ public class ElevensBoard {
      */
     public boolean anotherPlayIsPossible() {
 		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+
         // Perform check 1: if 2 cards add to 11
         ArrayList<Integer> tempCards = new ArrayList<>();
         for (int i = 0; i < cards.length - 1; i ++) {
@@ -278,6 +277,11 @@ public class ElevensBoard {
      */
     private boolean containsPairSum11(List<Integer> selectedCards) {
 		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        int score = 0;
+        for (int i = 0; i < selectedCards.size(); i ++) {
+            score += cards[selectedCards.get(i)].getPointValue();
+        }
+        return (score == 11);
     }
 
     /**
@@ -290,5 +294,18 @@ public class ElevensBoard {
      */
     private boolean containsJQK(List<Integer> selectedCards) {
 		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        int jacks = 0, queens = 0, kings = 0;
+        for (int i = 0; i < selectedCards.size(); i ++) {
+            if (cards[i].getRank().equals("jack")) {
+                jacks ++;
+            }
+            if (cards[i].getRank().equals("queen")) {
+                queens ++;
+            }
+            if (cards[i].getRank().equals("king")) {
+                kings ++;
+            }
+        }
+        return (jacks == 1 && queens == 1 && kings == 1);
     }
 }
