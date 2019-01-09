@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * The ElevensBoard class represents the board in a game of Elevens.
  */
-public class ElevensBoard extends Board {
+public class ElevensBoard {
 
     /**
      * The size (number of cards) on the board.
@@ -31,6 +31,17 @@ public class ElevensBoard extends Board {
     private static final int[] POINT_VALUES =
             {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0};
 
+
+    /**
+     * The cards on this board.
+     */
+    private Card[] cards;
+
+    /**
+     * The deck of cards being used to play the current game.
+     */
+    private Deck deck;
+
     /**
      * Flag used to control debugging print statements.
      */
@@ -41,7 +52,128 @@ public class ElevensBoard extends Board {
      * Creates a new <code>ElevensBoard</code> instance.
      */
     public ElevensBoard() {
-        super(BOARD_SIZE, RANKS, SUITS, POINT_VALUES);
+        cards = new Card[BOARD_SIZE];
+        deck = new Deck(RANKS, SUITS, POINT_VALUES);
+        if (I_AM_DEBUGGING) {
+            System.out.println(deck);
+            System.out.println("----------");
+        }
+        dealMyCards();
+    }
+
+    /**
+     * Start a new game by shuffling the deck and
+     * dealing some cards to this board.
+     */
+    public void newGame() {
+        deck.shuffle();
+        dealMyCards();
+    }
+
+    /**
+     * Accesses the size of the board.
+     * Note that this is not the number of cards it contains,
+     * which will be smaller near the end of a winning game.
+     * @return the size of the board
+     */
+    public int size() {
+        return cards.length;
+    }
+
+    /**
+     * Determines if the board is empty (has no cards).
+     * @return true if this board is empty; false otherwise.
+     */
+    public boolean isEmpty() {
+        for (int k = 0; k < cards.length; k++) {
+            if (cards[k] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Deal a card to the kth position in this board.
+     * If the deck is empty, the kth card is set to null.
+     * @param k the index of the card to be dealt.
+     */
+    public void deal(int k) {
+        cards[k] = deck.deal();
+    }
+
+    /**
+     * Accesses the deck's size.
+     * @return the number of undealt cards left in the deck.
+     */
+    public int deckSize() {
+        return deck.size();
+    }
+
+    /**
+     * Accesses a card on the board.
+     * @return the card at position k on the board.
+     * @param k is the board position of the card to return.
+     */
+    public Card cardAt(int k) {
+        return cards[k];
+    }
+
+    /**
+     * Replaces selected cards on the board by dealing new cards.
+     * @param selectedCards is a list of the indices of the
+     *        cards to be replaced.
+     */
+    public void replaceSelectedCards(List<Integer> selectedCards) {
+        for (Integer k : selectedCards) {
+            deal(k.intValue());
+        }
+    }
+
+    /**
+     * Gets the indexes of the actual (non-null) cards on the board.
+     *
+     * @return a List that contains the locations (indexes)
+     *         of the non-null entries on the board.
+     */
+    public List<Integer> cardIndexes() {
+        List<Integer> selected = new ArrayList<Integer>();
+        for (int k = 0; k < cards.length; k++) {
+            if (cards[k] != null) {
+                selected.add(new Integer(k));
+            }
+        }
+        return selected;
+    }
+
+    /**
+     * Generates and returns a string representation of this board.
+     * @return the string version of this board.
+     */
+    public String toString() {
+        String s = "";
+        for (int k = 0; k < cards.length; k++) {
+            s = s + k + ": " + cards[k] + "\n";
+        }
+        return s;
+    }
+
+    /**
+     * Determine whether or not the game has been won,
+     * i.e. neither the board nor the deck has any more cards.
+     * @return true when the current game has been won;
+     *         false otherwise.
+     */
+    public boolean gameIsWon() {
+        if (deck.isEmpty()) {
+            for (Card c : cards) {
+                if (c != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -53,9 +185,28 @@ public class ElevensBoard extends Board {
      * @return true if the selected cards form a valid group for removal;
      *         false otherwise.
      */
-    @Override
     public boolean isLegal(List<Integer> selectedCards) {
-		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        if (selectedCards.size() == 3) {
+            int jacks = 0, queens = 0, kings = 0;
+            for (int i = 0; i < 3; i ++) {
+                if (cards[i].getRank().equals("jack")) {
+                    jacks ++;
+                }
+                if (cards[i].getRank().equals("queen")) {
+                    queens ++;
+                }
+                if (cards[i].getRank().equals("king")) {
+                    kings ++;
+                }
+            }
+            return (jacks == 1 && queens == 1 && kings == 1);
+
+        }
+        if (selectedCards.size() == 2) {
+            return (cards[0].getPointValue() + cards[1].getPointValue() == 11);
+        }
+        return false;
     }
 
     /**
@@ -66,9 +217,54 @@ public class ElevensBoard extends Board {
      * @return true if there is a legal play left on the board;
      *         false otherwise.
      */
-    @Override
     public boolean anotherPlayIsPossible() {
-		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+
+        // Perform check 1: if 2 cards add to 11
+        ArrayList<Integer> tempCards = new ArrayList<>();
+        for (int i = 0; i < cards.length - 1; i ++) {
+            for (int j = 1; j < cards.length; j ++) {
+                tempCards.add(i);
+                tempCards.add(j);
+                if (isLegal(tempCards)) {
+                    return true;
+                }
+                tempCards.clear();
+            }
+        }
+        // Perform check 2: if 3 cards are j, q, and k
+        for (int i = 0; i < cards.length - 2; i ++) {
+            for (int j = 1; j < cards.length - 1; j ++) {
+                for (int k = 2; k < cards.length; k ++) {
+                    tempCards.add(i);
+                    tempCards.add(j);
+                    tempCards.add(k);
+                    if (isLegal(tempCards)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+        /*
+        for (int i = 0; i < cards.length - 1; i ++) {
+            for (int j = 1; j < cards.length; j ++) {
+                if (cards[i].getPointValue() + cards[j].getPointValue() == 11) {
+                    return true;
+                }
+            }
+        }
+        */
+    }
+
+
+    /**
+     * Deal cards to this board to start the game.
+     */
+    private void dealMyCards() {
+        for (int k = 0; k < cards.length; k++) {
+            cards[k] = deck.deal();
+        }
     }
 
     /**
@@ -80,7 +276,12 @@ public class ElevensBoard extends Board {
      *              contain an 11-pair; false otherwise.
      */
     private boolean containsPairSum11(List<Integer> selectedCards) {
-		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        int score = 0;
+        for (int i = 0; i < selectedCards.size(); i ++) {
+            score += cards[selectedCards.get(i)].getPointValue();
+        }
+        return (score == 11);
     }
 
     /**
@@ -92,7 +293,19 @@ public class ElevensBoard extends Board {
      *              include a jack, a queen, and a king; false otherwise.
      */
     private boolean containsJQK(List<Integer> selectedCards) {
-		/* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
+        int jacks = 0, queens = 0, kings = 0;
+        for (int i = 0; i < selectedCards.size(); i ++) {
+            if (cards[i].getRank().equals("jack")) {
+                jacks ++;
+            }
+            if (cards[i].getRank().equals("queen")) {
+                queens ++;
+            }
+            if (cards[i].getRank().equals("king")) {
+                kings ++;
+            }
+        }
+        return (jacks == 1 && queens == 1 && kings == 1);
     }
 }
-
