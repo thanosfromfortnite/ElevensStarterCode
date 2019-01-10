@@ -191,13 +191,13 @@ public class ElevensBoard extends Board {
         if (selectedCards.size() == 3) {
             int jacks = 0, queens = 0, kings = 0;
             for (int i = 0; i < 3; i ++) {
-                if (cards[i].rank().equals("jack")) {
+                if (cards[selectedCards.get(i)].rank().equals("jack")) {
                     jacks ++;
                 }
-                if (cards[i].rank().equals("queen")) {
+                if (cards[selectedCards.get(i)].rank().equals("queen")) {
                     queens ++;
                 }
-                if (cards[i].rank().equals("king")) {
+                if (cards[selectedCards.get(i)].rank().equals("king")) {
                     kings ++;
                 }
             }
@@ -205,7 +205,7 @@ public class ElevensBoard extends Board {
 
         }
         if (selectedCards.size() == 2) {
-            return (cards[0].pointValue() + cards[1].pointValue() == 11);
+            return (cards[selectedCards.get(0)].pointValue() + cards[selectedCards.get(1)].pointValue() == 11);
         }
         return false;
     }
@@ -243,6 +243,7 @@ public class ElevensBoard extends Board {
                     if (isLegal(tempCards)) {
                         return true;
                     }
+                    tempCards.clear();
                 }
             }
         }
@@ -278,11 +279,19 @@ public class ElevensBoard extends Board {
      */
     private boolean containsPairSum11(List<Integer> selectedCards) {
         /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
-        int score = 0;
-        for (int i = 0; i < selectedCards.size(); i ++) {
-            score += cards[selectedCards.get(i)].pointValue();
+
+        ArrayList<Integer> tempCards = new ArrayList<>();
+        for (int i = 0; i < selectedCards.size() - 1; i ++) {
+            for (int j = 1; j < selectedCards.size(); j ++) {
+                tempCards.add(i);
+                tempCards.add(j);
+                if (isLegal(tempCards)) {
+                    return true;
+                }
+                tempCards.clear();
+            }
         }
-        return (score == 11);
+        return false;
     }
 
     /**
@@ -297,13 +306,13 @@ public class ElevensBoard extends Board {
         /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
         int jacks = 0, queens = 0, kings = 0;
         for (int i = 0; i < selectedCards.size(); i ++) {
-            if (cards[i].rank().equals("jack")) {
+            if (cards[selectedCards.get(i)].rank().equals("jack")) {
                 jacks ++;
             }
-            if (cards[i].rank().equals("queen")) {
+            if (cards[selectedCards.get(i)].rank().equals("queen")) {
                 queens ++;
             }
-            if (cards[i].rank().equals("king")) {
+            if (cards[selectedCards.get(i)].rank().equals("king")) {
                 kings ++;
             }
         }
