@@ -51,8 +51,15 @@ public class ElevensBoard extends Board {
     /**
      * Creates a new <code>ElevensBoard</code> instance.
      */
-    public ElevensBoard(int size, String[] ranks, String[] suits, int[] pointValues) {
-        super(size, ranks, suits, pointValues);
+    public ElevensBoard() {
+        super(BOARD_SIZE, RANKS, SUITS, POINT_VALUES);
+        cards = new Card[BOARD_SIZE];
+        deck = new Deck(RANKS, SUITS, POINT_VALUES);
+        if (I_AM_DEBUGGING) {
+            System.out.println(deck);
+            System.out.println("----------");
+        }
+        dealMyCards();
     }
 
     /**
