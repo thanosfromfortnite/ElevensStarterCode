@@ -29,7 +29,7 @@ public class TensBoard extends Board {
      * The values of the cards for this game to be sent to the deck.
      */
     private static final int[] POINT_VALUES =
-            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0};
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0};
 
 
     /**
@@ -189,23 +189,26 @@ public class TensBoard extends Board {
     public boolean isLegal(List<Integer> selectedCards) {
         /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
         if (selectedCards.size() == 3) {
-            int jacks = 0, queens = 0, kings = 0;
+            int tens = 0, jacks = 0, queens = 0, kings = 0, totals = 0;
             for (int i = 0; i < 3; i ++) {
+                if (cards[selectedCards.get(i)].rank().equals("10")) {
+                    tens ++; totals ++;
+                }
                 if (cards[selectedCards.get(i)].rank().equals("jack")) {
-                    jacks ++;
+                    jacks ++; totals ++;
                 }
                 if (cards[selectedCards.get(i)].rank().equals("queen")) {
-                    queens ++;
+                    queens ++; totals ++;
                 }
                 if (cards[selectedCards.get(i)].rank().equals("king")) {
-                    kings ++;
+                    kings ++; totals ++;
                 }
             }
-            return (jacks == 1 && queens == 1 && kings == 1);
+            return (totals == 3) && (tens <= 1 && jacks <= 1 && queens <= 1 && kings <= 1);
 
         }
         if (selectedCards.size() == 2) {
-            return (cards[selectedCards.get(0)].pointValue() + cards[selectedCards.get(1)].pointValue() == 11);
+            return (cards[selectedCards.get(0)].pointValue() + cards[selectedCards.get(1)].pointValue() == 10);
         }
         return false;
     }
@@ -221,7 +224,7 @@ public class TensBoard extends Board {
     public boolean anotherPlayIsPossible() {
         /* *** TO BE IMPLEMENTED IN ACTIVITY 9 *** */
 
-        // Perform check 1: if 2 cards add to 11
+        // Perform check 1: if 2 cards add to 10
         ArrayList<Integer> tempCards = new ArrayList<>();
         for (int i = 0; i < cards.length - 1; i ++) {
             for (int j = 1; j < cards.length; j ++) {
